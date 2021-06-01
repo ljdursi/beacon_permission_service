@@ -10,7 +10,7 @@ registered_datasets = ["registered3"]
 
 controlled_access_list = {"user1": ["controlled4"],    # TODO - should use iss:sub for this rather than username
                           "user2": ["controlled5"]}
-
+opt_in_datasets = ["controlled4"]
 #
 # Provided: 
 # input = {
@@ -57,10 +57,23 @@ controlled_allowed = controlled_access_list[username]{
 }
 
 #
+# is it for counts endpoint?
+#
+
+default counts_allowed = false
+
+counts_allowed = true {
+    valid_token == true
+    input.method = "GET"
+    input.path = ["counts"]
+}
+
+#
 # List of all allowed datasets for this request
 #
 
-datasets = array.concat(array.concat(open_datasets, registered_allowed), controlled_allowed) {
-  input.method = "GET"                   # only allow GET requests
-  input.path = ["beacon"]                # only allow queries to beacon endpoint
-}
+datasets = array.concat(open_datasets, opt_in_datasets) { counts_allowed == true }
+        else = array.concat(array.concat(open_datasets, registered_allowed), controlled_allowed) {
+              input.method = "GET"                   # only allow GET requestst
+              input.path = ["beacon"]
+            }
