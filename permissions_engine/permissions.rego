@@ -57,23 +57,16 @@ controlled_allowed = controlled_access_list[username]{
 }
 
 #
-# is it for counts endpoint?
-#
-
-default counts_allowed = false
-
-counts_allowed = true {
-    valid_token == true
-    input.method = "GET"
-    input.path = ["counts"]
-}
-
-#
 # List of all allowed datasets for this request
 #
 
-datasets = array.concat(open_datasets, opt_in_datasets) { counts_allowed == true }
-        else = array.concat(array.concat(open_datasets, registered_allowed), controlled_allowed) {
-              input.method = "GET"                   # only allow GET requestst
-              input.path = ["beacon"]
-            }
+datasets = array.concat(array.concat(open_datasets, registered_allowed), controlled_allowed) {
+    input.method = "GET"                   # only allow GET requestst
+    input.path = ["beacon"]
+}
+
+datasets = array.concat(open_datasets, opt_in_datasets) {
+     valid_token == true
+     input.method = "GET"
+     input.path = ["counts"]
+}
